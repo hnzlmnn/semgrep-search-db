@@ -33,7 +33,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{ env.GH_USER }}
+        username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Install oras
       run: |
