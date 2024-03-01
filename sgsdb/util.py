@@ -14,17 +14,18 @@
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from datetime import timedelta
+from typing import Tuple
 
 from ruamel.yaml import YAML
 
 yaml = YAML(typ='rt')
 
 
-def hours_minutes_seconds(td: timedelta):
+def hours_minutes_seconds(td: timedelta) -> Tuple[int, int, int]:
     return td.seconds//3600, (td.seconds//60) % 60, td.seconds % 60
 
 
-def human_readable(td: timedelta):
+def human_readable(td: timedelta) -> str:
     hours, minutes, seconds = hours_minutes_seconds(td)
     if hours > 0:
         return f'{hours}h{minutes}m{seconds}s'

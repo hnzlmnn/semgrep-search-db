@@ -17,7 +17,7 @@
 import argparse
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Generator, Optional
 from zipfile import ZipFile, ZipInfo
@@ -101,7 +101,7 @@ class RepositoryProcessor:
         if self.args.progress:
             files = tqdm(archive.filelist, desc=f'Processing {self.repo.name}')
 
-        start_time = datetime.now()
+        start_time = datetime.now(timezone.utc)
         with logging_redirect_tqdm():
             for file in files:
                 try:
@@ -117,7 +117,7 @@ class RepositoryProcessor:
                 except Exception:
                     self.exceptions += 1
 
-        elapsed_time = datetime.now() - start_time
+        elapsed_time = datetime.now(timezone.utc) - start_time
         logger.info('Finished loading semgrep in %s [Ignored: %d, Errors: %d, Successful: %d]',
                     human_readable(elapsed_time), self.ignored,
                     self.exceptions + self.missing_rules + self.invalid, self.success)
