@@ -13,12 +13,16 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import logging
+import sys
 from datetime import timedelta
 from typing import Tuple
 
 from ruamel.yaml import YAML
 
 yaml = YAML(typ='rt')
+
+PRINT_LOG_LEVEL = False
 
 
 def hours_minutes_seconds(td: timedelta) -> Tuple[int, int, int]:
@@ -34,3 +38,21 @@ def human_readable(td: timedelta) -> str:
     if seconds > 0:
         return f'{seconds}s'
     return f'0.{td.microseconds // 1000}s'
+
+
+logger = logging.getLogger('sgsdb')
+
+
+def build_logger(args=None):
+    log_format = '%(message)s'
+    if PRINT_LOG_LEVEL:
+        log_format = f'[%(levelname)s] {log_format}'
+
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+
+    console_handler = logging.StreamHandler(sys.stderr)
+    console_handler.setFormatter(logging.Formatter(log_format))
+    console_handler.setLevel(logging.DEBUG if args and args.verbose > 0 else logging.INFO)
+    logger.addHandler(console_handler)
+    logger.setLevel(logging.DEBUG)

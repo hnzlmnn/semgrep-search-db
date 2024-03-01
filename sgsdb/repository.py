@@ -16,6 +16,7 @@
 
 import argparse
 import logging
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,9 +29,10 @@ from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from .rule import Rule, is_valid
-from .util import human_readable
+from .util import human_readable, logger
 
-logger = logging.getLogger(__name__)
+RE_FILENAME = re.compile(r'^.*\.ya?ml$')
+RE_TESTFILE = re.compile(r'^.*\.test\.ya?ml$')
 
 
 @dataclass
@@ -64,12 +66,20 @@ class RepositoryProcessor:
         return ZipFile(filename)
 
     def _get_path(self, file: ZipInfo) -> Optional[Path]:
-        if file.is_dir() or not file.filename.endswith('.yaml') or file.filename.endswith('.test.yaml'):
+        if file.is_dir():
+            self.ignored += 1
+            return None
+
+        if not RE_FILENAME.match(file.filename) or RE_TESTFILE.match(file.filename):
+            if self.args.verbose > 1:
+                logger.debug('Ignoring due to file name: %s', file.filename)
             self.ignored += 1
             return None
 
         path = Path(file.filename).relative_to(Path(file.filename).parents[-2])
         if any(d.startswith('.') for d in path.parts):
+            if self.args.verbose > 1:
+                logger.debug('Ignoring hidden file: %s', path)
             self.ignored += 1
             return None
 
@@ -102,7 +112,7 @@ class RepositoryProcessor:
             files = tqdm(archive.filelist, desc=f'Processing {self.repo.name}')
 
         start_time = datetime.now(timezone.utc)
-        with logging_redirect_tqdm():
+        with logging_redirect_tqdm([logger]):
             for file in files:
                 try:
                     path = self._get_path(file)
