@@ -43,7 +43,7 @@ jobs:
     - name: Upload assets to GHCR
       run: |
         ./oras version
-        ./oras push --artifact-type application/vnd.aquasec.trivy.config.v1+json \
-            ghcr.io/${{ github.repository }}:$(date '+%Y%m%d%H%M%S') \
+        ./oras push --artifact-type application/vnd.sgs.config.v1+json \
+            ghcr.io/${{ github.repository }}:latest,$(date '+%Y%m%d%H%M%S') \
             db.json:application/vnd.sgs.config.v1+json
 
