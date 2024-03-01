@@ -41,6 +41,8 @@ def parse_args() -> argparse.Namespace:
                         help='Do not log errors found while parsing a rule file')
     parser.add_argument('-c', '--cache', dest='cache', action='store_true', default=False,
                         help='Only download repository data if not already present')
+    parser.add_argument('-p', '--progress', dest='progress', action='store_true', default=False,
+                        help='Show a progress bar while processing data')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                         help='Enable verbose logging')
 
@@ -55,7 +57,6 @@ def main() -> int:
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO, format=log_format)
 
     return build_db(args)
-
 
 
 if __name__ == '__main__':

@@ -17,6 +17,7 @@
 import argparse
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Generator, Optional
 from zipfile import ZipFile, ZipInfo
@@ -27,6 +28,7 @@ from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from .rule import Rule, is_valid
+from .util import human_readable
 
 logger = logging.getLogger(__name__)
 
@@ -95,8 +97,13 @@ class RepositoryProcessor:
     def iter_rules(self) -> Generator[Rule, None, None]:
         archive = self._download_zip(self.repo)
 
+        files = archive.filelist
+        if self.args.progress:
+            files = tqdm(archive.filelist, desc=f'Processing {self.repo.name}')
+
+        start_time = datetime.now()
         with logging_redirect_tqdm():
-            for file in tqdm(archive.filelist, desc=f'Processing {self.repo.name}'):
+            for file in files:
                 try:
                     path = self._get_path(file)
                     if not path:
@@ -110,5 +117,7 @@ class RepositoryProcessor:
                 except Exception:
                     self.exceptions += 1
 
-        logger.info('Finished loading semgrep [Ignored: %d, Errors: %d, Successful: %d]',
-                    self.ignored, self.exceptions + self.missing_rules + self.invalid, self.success)
+        elapsed_time = datetime.now() - start_time
+        logger.info('Finished loading semgrep in %s [Ignored: %d, Errors: %d, Successful: %d]',
+                    human_readable(elapsed_time), self.ignored,
+                    self.exceptions + self.missing_rules + self.invalid, self.success)
