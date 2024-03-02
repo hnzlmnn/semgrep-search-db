@@ -1,10 +1,11 @@
 [tool.poetry]
-name = "sgs-db"
+name = "semgrep-search-db"
 version = "1.1.0"
-description = "Database creator for sgs (semgrep-search)"
+description = "Database creator for semgrep-search"
 authors = ["Malte Heinzelmann <malte@cybaer.ninja>"]
 readme = "README.md"
 license = "GPL-3.0-or-later"
+homepage = "https://github.com/hnzlmnn/semgrep-search-db"
 packages = [{include = "sgsdb"}]
 
 [tool.poetry.scripts]

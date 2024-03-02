@@ -1,4 +1,4 @@
-#      Semgrep-Search Database (sgs-db)
+#      Semgrep-Search Database
 #      Copyright (C) 2024  Malte Heinzelmann
 #
 #      This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ def human_readable(td: timedelta) -> str:
     return f'0.{td.microseconds // 1000}s'
 
 
-logger = logging.getLogger('sgsdb')
+logger = logging.getLogger('semgrep-search-db')
 
 
 def build_logger(args: argparse.Namespace) -> None:
@@ -77,7 +77,7 @@ def generate_metdata() -> dict:
     git = gitinfo.get_git_info()
 
     try:
-        version = metadata.version('sgs-db')
+        version = metadata.version('semgrep-search-db')
     except PackageNotFoundError:
         try:
             with Path('pyproject.toml').open('rb') as fin:

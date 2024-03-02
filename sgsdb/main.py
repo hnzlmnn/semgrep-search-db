@@ -1,4 +1,4 @@
-#      Semgrep-Search Database (sgs-db)
+#      Semgrep-Search Database
 #      Copyright (C) 2024  Malte Heinzelmann
 #
 #      This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ from sgsdb.util import build_logger
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog='sgs-db',
-                                     description='Build the database for sgs (semgrep-search) from multiple sources')
+                                     description='Build the database for semgrep-search from multiple sources')
 
     parser.add_argument('DATABASE', help='The path to the database file')
 
