@@ -55,6 +55,11 @@ def build_db(args: argparse.Namespace) -> int:
     if not args.append:
         db.truncate()
 
+    meta = db.table('meta')
+    meta.insert({'created_on': str(datetime.now(timezone.utc))})
+
+    rules = db.table('rules')
+
     ids = set()
 
     start_time = datetime.now(timezone.utc)
@@ -66,9 +71,11 @@ def build_db(args: argparse.Namespace) -> int:
             if args.ignore_duplicates:
                 continue
         ids.add(rule.id)
-        db.insert(rule.__dict__)
+        rules.insert(rule.__dict__)
 
     elapsed_time = datetime.now(timezone.utc) - start_time
     logger.info('Finished database generation in %s resulting in %d rules.', human_readable(elapsed_time), len(db))
+
+    db.close()
 
     return 0
