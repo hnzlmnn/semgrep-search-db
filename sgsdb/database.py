@@ -34,7 +34,7 @@ REPOSITORIES = [
                'https://github.com/0xdea/semgrep-rules/archive/refs/heads/main.zip'),
     Repository('trailofbits', 'Trail of Bits Rules',
                'https://github.com/trailofbits/semgrep-rules/archive/refs/heads/main.zip'),
-    Repository('elttam', 'elttam Rules',
+    Repository('elttam', 'Elttam Rules',
                'https://github.com/elttam/semgrep-rules/archive/refs/heads/main.zip'),
 ]
 

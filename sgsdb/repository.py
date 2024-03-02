@@ -127,6 +127,6 @@ class RepositoryProcessor:
                     self.exceptions += 1
 
         elapsed_time = datetime.now(timezone.utc) - start_time
-        logger.info('Finished loading semgrep in %s [Ignored: %d, Errors: %d, Successful: %d]',
-                    human_readable(elapsed_time), self.ignored,
+        logger.info('Finished loading %s in %s [Ignored: %d, Errors: %d, Successful: %d]',
+                    self.repo.name, human_readable(elapsed_time), self.ignored,
                     self.exceptions + self.missing_rules + self.invalid, self.success)
