@@ -81,7 +81,7 @@ def build_db(args: argparse.Namespace) -> int:
             rules.insert(rule.__dict__)
 
         elapsed_time = datetime.now(timezone.utc) - start_time
-        logger.info('Finished database generation in %s resulting in %d rules.', human_readable(elapsed_time), len(db))
+        logger.info('Finished database generation in %s resulting in %d rules.', human_readable(elapsed_time), len(rules))
     finally:
         db.close()
 
