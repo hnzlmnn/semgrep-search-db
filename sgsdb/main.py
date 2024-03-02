@@ -15,14 +15,10 @@
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
-import logging
 import sys
 
 from sgsdb import build_db
-
-logger = logging.getLogger('sgsdb')
-
-LOG_LEVEL = False
+from sgsdb.util import build_logger
 
 
 def parse_args() -> argparse.Namespace:
@@ -41,7 +37,9 @@ def parse_args() -> argparse.Namespace:
                         help='Do not log errors found while parsing a rule file')
     parser.add_argument('-c', '--cache', dest='cache', action='store_true', default=False,
                         help='Only download repository data if not already present')
-    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
+    parser.add_argument('-p', '--progress', dest='progress', action='store_true', default=False,
+                        help='Show a progress bar while processing data')
+    parser.add_argument('-v', '--verbose', dest='verbose', action='count', default=0,
                         help='Enable verbose logging')
 
     return parser.parse_args()
@@ -49,13 +47,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    log_format = '%(message)s'
-    if LOG_LEVEL:
-        log_format = f'[%(levelname)s] {log_format}'
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO, format=log_format)
+    build_logger(args)
 
     return build_db(args)
-
 
 
 if __name__ == '__main__':

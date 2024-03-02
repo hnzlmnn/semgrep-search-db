@@ -14,15 +14,11 @@
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import logging
 from dataclasses import dataclass
 from io import StringIO
 from typing import Optional, Any, Type
 
-from .util import yaml
-
-
-logger = logging.getLogger(__name__)
+from .util import yaml, logger
 
 
 def validate_optional(rule: dict, key: str, expect_type: Type[Any]) -> None:

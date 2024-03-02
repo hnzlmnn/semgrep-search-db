@@ -15,24 +15,27 @@
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
-import logging
 import sys
+from datetime import datetime, timezone
 from typing import Generator
 
 from tinydb import TinyDB
 
 from sgsdb.repository import Repository, RepositoryProcessor
 from sgsdb.rule import Rule
-
-logger = logging.getLogger(__name__)
+from sgsdb.util import logger, human_readable
 
 REPOSITORIES = [
     Repository('semgrep', 'Semgrep Registry',
                'https://github.com/semgrep/semgrep-rules/archive/refs/heads/develop.zip'),
     Repository('semgrep', 'GitLab SAST',
                'https://gitlab.com/gitlab-org/security-products/sast-rules/-/archive/main/sast-rules-main.zip'),
-    Repository('semgrep', '0xdea Rules',
+    Repository('0xdea', '0xdea Rules',
                'https://github.com/0xdea/semgrep-rules/archive/refs/heads/main.zip'),
+    Repository('trailofbits', 'Trail of Bits Rules',
+               'https://github.com/trailofbits/semgrep-rules/archive/refs/heads/main.zip'),
+    Repository('elttam', 'Elttam Rules',
+               'https://github.com/elttam/semgrep-rules/archive/refs/heads/main.zip'),
 ]
 
 
@@ -53,6 +56,9 @@ def build_db(args: argparse.Namespace) -> int:
         db.truncate()
 
     ids = set()
+
+    start_time = datetime.now(timezone.utc)
+
     for rule in collect(args):
         if rule.id in ids:
             if args.log_duplicates:
@@ -61,5 +67,8 @@ def build_db(args: argparse.Namespace) -> int:
                 continue
         ids.add(rule.id)
         db.insert(rule.__dict__)
+
+    elapsed_time = datetime.now(timezone.utc) - start_time
+    logger.info('Finished database generation in %s resulting in %d rules.', human_readable(elapsed_time), len(db))
 
     return 0
