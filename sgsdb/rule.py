@@ -18,7 +18,8 @@ from dataclasses import dataclass
 from io import StringIO
 from typing import Optional, Any, Type
 
-from .util import yaml, logger
+from .repository import Repository
+from .util import yaml, logger, fix_languages
 
 
 def validate_optional(rule: dict, key: str, expect_type: Type[Any]) -> None:
@@ -60,6 +61,7 @@ def is_valid(rule: dict) -> bool:
 @dataclass
 class Rule:
     source: str
+    source_name: str
     id: str
     severity: str
     languages: list[str]
@@ -67,15 +69,21 @@ class Rule:
     content: str
 
     @staticmethod
-    def from_file(source: str, data: dict) -> 'Rule':
+    def from_file(source: Repository, data: dict) -> 'Rule':
+        data.setdefault('metadata', {})
+        data['metadata'].setdefault('semgrep.dev', {})
+        data['metadata']['semgrep.dev'].setdefault('rule', {})
+        data['metadata']['semgrep.dev']['rule']['origin'] = source.name
+
         buf = StringIO()
         yaml.dump(data, buf)
 
         return Rule(
-            source,
+            source.id,
+            source.name,
             data['id'],
             data['severity'],
-            list(data['languages']),
+            list(fix_languages(data['languages'])),
             data.get('metadata', {}).get('category', None),
             buf.getvalue(),
         )

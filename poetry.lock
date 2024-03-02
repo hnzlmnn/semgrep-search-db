@@ -133,6 +133,17 @@ files = [
 ]
 
 [[package]]
+name = "python-git-info"
+version = "0.8.3"
+description = "Get git information repository, directly from .git"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-git-info-0.8.3.tar.gz", hash = "sha256:c08a2764a16da029e4db909ab8436ae484f8846405f83b1bcfd415fe5e3ab30d"},
+    {file = "python_git_info-0.8.3-py3-none-any.whl", hash = "sha256:f8911aa590170434272c834d1967b74faea71ee573e50cbe0b88e938e3db406b"},
+]
+
+[[package]]
 name = "requests"
 version = "2.31.0"
 description = "Python HTTP for Humans."
@@ -242,6 +253,17 @@ files = [
 ]
 
 [[package]]
+name = "tomli"
+version = "2.0.1"
+description = "A lil' TOML parser"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
+    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
 name = "tqdm"
 version = "4.66.2"
 description = "Fast, Extensible Progress Meter"
@@ -281,4 +303,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c151957cb98a8bffe6bc7da0372b35238c92f42812f80068345b189afe1c40f9"
+content-hash = "13a613668fbac95f00d266d4848cad878e9357bef840fab86a100ae41c0bfd82"

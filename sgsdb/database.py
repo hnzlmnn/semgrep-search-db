@@ -20,15 +20,18 @@ from datetime import datetime, timezone
 from typing import Generator
 
 from tinydb import TinyDB
+from tinydb.storages import JSONStorage
+from tinydb.middlewares import CachingMiddleware
 
-from sgsdb.repository import Repository, RepositoryProcessor
+from sgsdb.repository import Repository
+from sgsdb.processor import RepositoryProcessor
 from sgsdb.rule import Rule
-from sgsdb.util import logger, human_readable
+from sgsdb.util import logger, human_readable, generate_metdata
 
 REPOSITORIES = [
     Repository('semgrep', 'Semgrep Registry',
                'https://github.com/semgrep/semgrep-rules/archive/refs/heads/develop.zip'),
-    Repository('semgrep', 'GitLab SAST',
+    Repository('gitlab', 'GitLab SAST',
                'https://gitlab.com/gitlab-org/security-products/sast-rules/-/archive/main/sast-rules-main.zip'),
     Repository('0xdea', '0xdea Rules',
                'https://github.com/0xdea/semgrep-rules/archive/refs/heads/main.zip'),
@@ -50,32 +53,36 @@ def collect(args: argparse.Namespace) -> Generator[Rule, None, None]:
 
 
 def build_db(args: argparse.Namespace) -> int:
-    db = TinyDB(args.DATABASE)
+    db = TinyDB(args.DATABASE, storage=CachingMiddleware(JSONStorage))
 
-    if not args.append:
-        db.truncate()
+    try:
+        meta = db.table('meta')
+        meta.truncate()
+        metadata = generate_metdata()
+        if args.verbose > 1:
+            logger.debug('Using metadata: %s', ', '.join(f'{k}: {v}' for k, v in metadata.items()))
+        meta.insert(metadata)
 
-    meta = db.table('meta')
-    meta.insert({'created_on': str(datetime.now(timezone.utc))})
+        rules = db.table('rules')
+        if not args.append:
+            rules.truncate()
 
-    rules = db.table('rules')
+        ids = set()
 
-    ids = set()
+        start_time = datetime.now(timezone.utc)
 
-    start_time = datetime.now(timezone.utc)
+        for rule in collect(args):
+            if rule.id in ids:
+                if args.log_duplicates:
+                    logger.warning('Found duplicate ID: %s in %s', rule.id, rule.source)
+                if args.ignore_duplicates:
+                    continue
+            ids.add(rule.id)
+            rules.insert(rule.__dict__)
 
-    for rule in collect(args):
-        if rule.id in ids:
-            if args.log_duplicates:
-                logger.warning('Found duplicate ID: %s in %s', rule.id, rule.source)
-            if args.ignore_duplicates:
-                continue
-        ids.add(rule.id)
-        rules.insert(rule.__dict__)
-
-    elapsed_time = datetime.now(timezone.utc) - start_time
-    logger.info('Finished database generation in %s resulting in %d rules.', human_readable(elapsed_time), len(db))
-
-    db.close()
+        elapsed_time = datetime.now(timezone.utc) - start_time
+        logger.info('Finished database generation in %s resulting in %d rules.', human_readable(elapsed_time), len(db))
+    finally:
+        db.close()
 
     return 0

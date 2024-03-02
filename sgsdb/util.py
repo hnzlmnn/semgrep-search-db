@@ -16,14 +16,28 @@
 import argparse
 import logging
 import sys
-from datetime import timedelta
-from typing import Tuple
+from datetime import timedelta, datetime, timezone
+from importlib import metadata
+from importlib.metadata import PackageNotFoundError
+from pathlib import Path
+from typing import Tuple, Union
 
+import tomli
+from gitinfo import gitinfo
 from ruamel.yaml import YAML
+
+from sgsdb.const import LANGUAGE_ALIASES
 
 yaml = YAML(typ='rt')
 
 PRINT_LOG_LEVEL = False
+
+
+def fix_languages(langauges: Union[set[str], list[str]]) -> set[str]:
+    """
+    Resolves all aliased languages to their base name
+    """
+    return {LANGUAGE_ALIASES.get(lang, lang) for lang in langauges}
 
 
 def hours_minutes_seconds(td: timedelta) -> Tuple[int, int, int]:
@@ -57,3 +71,22 @@ def build_logger(args: argparse.Namespace) -> None:
     console_handler.setLevel(logging.DEBUG if args.verbose > 0 else logging.INFO)
     logger.addHandler(console_handler)
     logger.setLevel(logging.DEBUG)
+
+
+def generate_metdata() -> dict:
+    git = gitinfo.get_git_info()
+
+    try:
+        version = metadata.version('sgs-db')
+    except PackageNotFoundError:
+        try:
+            with Path('pyproject.toml').open('rb') as fin:
+                version = tomli.load(fin).get('tool').get('poetry').get('version')
+        except Exception:
+            version = 'dev'
+
+    return {
+        'created_on': str(datetime.now(timezone.utc)),
+        'version': version,
+        'commit': 'unknown' if git is None else git['commit'][:7],
+    }
