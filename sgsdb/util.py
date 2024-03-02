@@ -13,6 +13,7 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import argparse
 import logging
 import sys
 from datetime import timedelta
@@ -43,7 +44,7 @@ def human_readable(td: timedelta) -> str:
 logger = logging.getLogger('sgsdb')
 
 
-def build_logger(args=None):
+def build_logger(args: argparse.Namespace) -> None:
     log_format = '%(message)s'
     if PRINT_LOG_LEVEL:
         log_format = f'[%(levelname)s] {log_format}'
@@ -53,6 +54,6 @@ def build_logger(args=None):
 
     console_handler = logging.StreamHandler(sys.stderr)
     console_handler.setFormatter(logging.Formatter(log_format))
-    console_handler.setLevel(logging.DEBUG if args and args.verbose > 0 else logging.INFO)
+    console_handler.setLevel(logging.DEBUG if args.verbose > 0 else logging.INFO)
     logger.addHandler(console_handler)
     logger.setLevel(logging.DEBUG)
