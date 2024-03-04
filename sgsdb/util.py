@@ -83,10 +83,11 @@ def generate_metdata() -> dict:
             with Path('pyproject.toml').open('rb') as fin:
                 version = tomli.load(fin).get('tool').get('poetry').get('version')
         except Exception:
-            version = 'dev'
+            version = '0.0.0-dev'
 
     return {
         'created_on': str(datetime.now(timezone.utc)),
         'version': version,
         'commit': 'unknown' if git is None else git['commit'][:7],
+        'min_version': '1.1.0',
     }

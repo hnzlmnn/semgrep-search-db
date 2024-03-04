@@ -19,40 +19,28 @@ import sys
 from datetime import datetime, timezone
 from typing import Generator
 
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
 from tinydb.middlewares import CachingMiddleware
 
-from sgsdb.repository import Repository
-from sgsdb.processor import RepositoryProcessor
+from sgsdb.config import Configuration
 from sgsdb.rule import Rule
 from sgsdb.util import logger, human_readable, generate_metdata
 
-REPOSITORIES = [
-    Repository('semgrep', 'Semgrep Registry',
-               'https://github.com/semgrep/semgrep-rules/archive/refs/heads/develop.zip'),
-    Repository('gitlab', 'GitLab SAST',
-               'https://gitlab.com/gitlab-org/security-products/sast-rules/-/archive/main/sast-rules-main.zip'),
-    Repository('0xdea', '0xdea Rules',
-               'https://github.com/0xdea/semgrep-rules/archive/refs/heads/main.zip'),
-    Repository('trailofbits', 'Trail of Bits Rules',
-               'https://github.com/trailofbits/semgrep-rules/archive/refs/heads/main.zip'),
-    Repository('elttam', 'Elttam Rules',
-               'https://github.com/elttam/semgrep-rules/archive/refs/heads/main.zip'),
-]
 
-
-def collect(args: argparse.Namespace) -> Generator[Rule, None, None]:
-    for repo in REPOSITORIES:
+def collect(args: argparse.Namespace, config: Configuration) -> Generator[Rule, None, None]:
+    for repo in config.repositories:
         try:
-            yield from RepositoryProcessor(repo, args).iter_rules()
+            yield from repo.iter_rules(args)
         except Exception as e:
-            logger.debug(str(e), exc_info=e)
-            logger.error('Exception during repository parsing')
+            if not args.quiet:
+                logger.info(str(e), exc_info=e)
+                logger.debug(str(e))
+            logger.error(f'Exception during repository parsing: {str(e)}')
             sys.exit(1)
 
 
-def build_db(args: argparse.Namespace) -> int:
+def build_db(args: argparse.Namespace, config: Configuration) -> int:
     db = TinyDB(args.DATABASE, storage=CachingMiddleware(JSONStorage))
 
     try:
@@ -63,6 +51,14 @@ def build_db(args: argparse.Namespace) -> int:
             logger.debug('Using metadata: %s', ', '.join(f'{k}: {v}' for k, v in metadata.items()))
         meta.insert(metadata)
 
+        repos = db.table('repos')
+        repos.truncate()
+        for repo in config.repositories:
+            repos.upsert(repo.to_dict(), Query().id == repo.id)
+
+        if isinstance(db.storage, CachingMiddleware):
+            db.storage.flush()
+
         rules = db.table('rules')
         if not args.append:
             rules.truncate()
@@ -71,7 +67,7 @@ def build_db(args: argparse.Namespace) -> int:
 
         start_time = datetime.now(timezone.utc)
 
-        for rule in collect(args):
+        for rule in collect(args, config):
             if rule.id in ids:
                 if args.log_duplicates:
                     logger.warning('Found duplicate ID: %s in %s', rule.id, rule.source)
@@ -81,8 +77,8 @@ def build_db(args: argparse.Namespace) -> int:
             rules.insert(rule.__dict__)
 
         elapsed_time = datetime.now(timezone.utc) - start_time
-        logger.info('Finished database generation in %s resulting in %d rules.',
-                    human_readable(elapsed_time), len(rules))
+        logger.info('Finished database generation in %s resulting in %d rules from %d origins.',
+                    human_readable(elapsed_time), len(rules), len(list(config.repositories)))
     finally:
         db.close()
 

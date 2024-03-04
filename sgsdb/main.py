@@ -16,8 +16,10 @@
 
 import argparse
 import sys
+from pathlib import Path
 
 from sgsdb import build_db
+from sgsdb.config import Configuration
 from sgsdb.util import build_logger
 
 
@@ -49,7 +51,9 @@ def main() -> int:
     args = parse_args()
     build_logger(args)
 
-    return build_db(args)
+    config = Configuration(Path('config.yaml'))
+
+    return build_db(args, config)
 
 
 if __name__ == '__main__':

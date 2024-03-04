@@ -16,52 +16,15 @@
 
 from dataclasses import dataclass
 from io import StringIO
-from typing import Optional, Any, Type
+from typing import Optional
 
-from .repository import Repository
-from .util import yaml, logger, fix_languages
-
-
-def validate_optional(rule: dict, key: str, expect_type: Type[Any]) -> None:
-    if key in rule and not isinstance(rule[key], expect_type):
-        found_type = rule[key].__class__.__name__
-        raise ValueError(f'wrong data type for {key} [expected: {expect_type.__name__}, found: {found_type}')
-
-
-def is_valid_taint(rule: dict) -> None:
-    validate_optional(rule, 'pattern-sources', list)
-    validate_optional(rule, 'pattern-sinks', list)
-
-
-def is_valid(rule: dict) -> bool:
-    try:
-        if rule.get('id') is None:
-            raise ValueError('missing id')
-        if rule.get('message') is None:
-            raise ValueError('missing message')
-        if rule.get('severity') is None:
-            raise ValueError('missing severity')
-        if rule.get('languages') is None:
-            raise ValueError('missing languages')
-
-        if rule.get('mode') == 'taint':
-            is_valid_taint(rule)
-        else:
-            validate_optional(rule, 'pattern', str)
-            validate_optional(rule, 'patterns', list)
-            validate_optional(rule, 'patter-either', list)
-            validate_optional(rule, 'pattern-regex', str)
-    except AssertionError as e:
-        logger.debug(str(e))
-        return False
-
-    return True
+from .base_repo import BaseRepository
+from .util import yaml, fix_languages
 
 
 @dataclass
 class Rule:
     source: str
-    source_name: str
     id: str
     severity: str
     languages: list[str]
@@ -69,7 +32,7 @@ class Rule:
     content: str
 
     @staticmethod
-    def from_file(source: Repository, data: dict) -> 'Rule':
+    def from_file(source: BaseRepository, data: dict) -> 'Rule':
         data.setdefault('metadata', {})
         data['metadata'].setdefault('semgrep.dev', {})
         data['metadata']['semgrep.dev'].setdefault('rule', {})
@@ -80,7 +43,6 @@ class Rule:
 
         return Rule(
             source.id,
-            source.name,
             data['id'],
             data['severity'],
             list(fix_languages(data['languages'])),

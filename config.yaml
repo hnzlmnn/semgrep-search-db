@@ -1,0 +1,97 @@
+repositories:
+  semgrep:
+    name: Semgrep Registry
+    type: github
+    repo: semgrep/semgrep-rules
+    branch: develop
+    license: LGPL 2.1
+  gitlab:
+    name: GitLab SAST
+    type: gitlab
+    repo: gitlab-org/security-products/sast-rules
+    branch: main
+    license: MIT
+  "0xdea":
+    name: 0xdea Rules
+    type: github
+    repo: 0xdea/semgrep-rules
+    branch: main
+    license: MIT
+  trailofbits:
+    name: Trail of Bits Rules
+    type: github
+    repo: trailofbits/semgrep-rules
+    branch: main
+    license: AGPL 3.0
+  elttam:
+    name: Elttam Rules
+    type: github
+    repo: elttam/semgrep-rules
+    branch: main
+    license: MIT
+  kondukto:
+    name: Kondukto Rules
+    type: github
+    repo: kondukto-io/semgrep-rules
+    branch: master
+    license:
+  dgryski:
+    name: Dgryski Go Rules
+    type: github
+    repo: dgryski/semgrep-go
+    branch: master
+    license: MIT
+  dotta:
+    name: Dotta Rules
+    type: github
+    repo: federicodotta/semgrep-rules
+    branch: main
+    license: MIT
+  hashicorp:
+    name: HashiCorp
+    type: github
+    repo: hashicorp-forge/semgrep-rules
+    branch: main
+    license: MPL 2.0
+  ligurio:
+    name: Ligurio Rules
+    type: github
+    repo: ligurio/semgrep-rules
+    branch: master
+    license: MIT
+  mindedsecurity:
+    name: mindedsecurity Android Rules
+    type: github
+    repo: mindedsecurity/semgrep-rules-android-security
+    branch: main
+    license: GPL 3.0
+  decurity:
+    name: Decurity Smart Contract Rules
+    type: github
+    repo: Decurity/semgrep-smart-contracts
+    branch: master
+    license: CC BY-NC-SA 4.0
+  avnulabs:
+    name: Avnu Labs Cairo Rules
+    type: github
+    repo: avnu-labs/semgrep-cairo-rules
+    branch: main
+    license:
+  dipa96:
+    name: Dipa96 Rules
+    type: github
+    repo: dipa96/semgrep-rules
+    branch: main
+    license:
+  akabe1:
+    name: Akabe1 Rules
+    type: github
+    repo: akabe1/akabe1-semgrep-rules
+    branch: main
+    license: GPL
+  vmnguyen:
+    name: Vmnguyen Rules
+    type: github
+    repo: vmnguyen/semgrep-rules
+    branch: master
+    license:
