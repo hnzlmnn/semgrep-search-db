@@ -18,8 +18,10 @@ from dataclasses import dataclass
 from io import StringIO
 from typing import Optional
 
+from ruamel.yaml import CommentedMap, CommentedSeq, YAML
+
 from .base_repo import BaseRepository
-from .util import yaml, fix_languages
+from .util import fix_languages, remove_comments
 
 
 @dataclass
@@ -32,14 +34,24 @@ class Rule:
     content: str
 
     @staticmethod
-    def from_file(source: BaseRepository, data: dict) -> 'Rule':
-        data.setdefault('metadata', {})
-        data['metadata'].setdefault('semgrep.dev', {})
-        data['metadata']['semgrep.dev'].setdefault('rule', {})
+    def from_file(source: BaseRepository, data: dict, path: str) -> 'Rule':
+        # Remove all comments as their indentation might be broken
+        data = remove_comments(data)
+
+        # Add metadata
+        data.setdefault('metadata', CommentedMap())
+        data['metadata'].setdefault('semgrep.dev', CommentedMap())
+        data['metadata']['semgrep.dev'].setdefault('rule', CommentedMap())
         data['metadata']['semgrep.dev']['rule']['origin'] = source.name
 
+        data['metadata'].setdefault('semgrep-search', CommentedMap())
+        data['metadata']['semgrep-search']['id'] = source.id
+        data['metadata']['semgrep-search']['name'] = source.name
+        data['metadata']['semgrep-search']['source'] = repr(source)
+        data['metadata']['semgrep-search']['file'] = source.filepath(path)
+
         buf = StringIO()
-        yaml.dump(data, buf)
+        YAML(typ='rt').dump(CommentedMap({'rules': CommentedSeq([data])}), buf)
 
         return Rule(
             source.id,

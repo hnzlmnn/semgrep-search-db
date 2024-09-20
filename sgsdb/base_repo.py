@@ -28,3 +28,6 @@ class BaseRepository:
             'name': self.name,
             'license': self.license,
         }
+
+    def filepath(self, path: str) -> str:
+        raise NotImplementedError

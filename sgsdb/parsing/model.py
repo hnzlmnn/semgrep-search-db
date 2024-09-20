@@ -13,21 +13,29 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from pathlib import Path
-from typing import Generator, Any
+import enum
+from dataclasses import dataclass, field
+from typing import List, TYPE_CHECKING
 
-from ruamel.yaml import YAML
+from sgsdb.parsing.statistic import ResultStatus
+from sgsdb.rule import Rule
 
-from sgsdb.repository import Repository
+if TYPE_CHECKING:
+    from sgsdb.repository import Repository
 
 
-class Configuration:
-    def __init__(self, file: Path) -> None:
-        yaml = YAML(typ='rt')
-        with file.open('r') as fin:
-            self.config: dict[str, Any] = yaml.load(fin)
+@dataclass
+class ParsingResult:
+    repository: 'Repository'
+    path: str
+    content: str
+    status: List[ResultStatus] = field(default_factory=list)
+    data: dict | None = None
+    rules: List[Rule] = field(default_factory=list)
 
-    @property
-    def repositories(self) -> Generator[Repository, None, None]:
-        for key, value in self.config['repositories'].items():
-            yield Repository.from_config(key, **value)
+
+class RuleMode(enum.Enum):
+    SEARCH = 'search'
+    TAINT = 'taint'
+    JOIN = 'join'  # Experimental
+    EXTRACT = 'extract'  # Experimental

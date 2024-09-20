@@ -16,19 +16,18 @@
 import argparse
 import logging
 import sys
+from collections import OrderedDict
 from datetime import timedelta, datetime, timezone
 from importlib import metadata
 from importlib.metadata import PackageNotFoundError
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 
 import tomli
 from gitinfo import gitinfo
-from ruamel.yaml import YAML
+from ruamel.yaml import CommentedSeq, CommentedMap
 
 from sgsdb.const import LANGUAGE_ALIASES
-
-yaml = YAML(typ='rt')
 
 PRINT_LOG_LEVEL = False
 
@@ -61,7 +60,7 @@ logger = logging.getLogger('semgrep-search-db')
 def build_logger(args: argparse.Namespace) -> None:
     log_format = '%(message)s'
     if PRINT_LOG_LEVEL:
-        log_format = f'[%(levelname)s] {log_format}'
+        log_format = f'[%(threadName)s] [%(levelname)s] {log_format}'
 
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)
@@ -91,3 +90,15 @@ def generate_metdata() -> dict:
         'commit': 'unknown' if git is None else git['commit'][:7],
         'min_version': '1.1.0',
     }
+
+
+def remove_comments(data: Any) -> Any:  # noqa: ANN401
+    if isinstance(data, (dict, OrderedDict, CommentedMap)):
+        return CommentedMap(OrderedDict([
+            (key, remove_comments(value)) for key, value in data.items()
+        ]))
+
+    if isinstance(data, (list, CommentedSeq)):
+        return CommentedSeq([remove_comments(item) for item in data])
+
+    return data

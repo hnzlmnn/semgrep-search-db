@@ -30,7 +30,17 @@ jobs:
     - name: Generate the database
       run: |
         echo "version=$(date '+%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
-        poetry run sgs-db "db.json"
+        poetry run sgs-db -V "db.json"
+    
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: db.json
+        asset_name: db.json
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: "Release for web UI"
     - name: Login to GitHub Packages Container registry
       uses: docker/login-action@v3
       with:
