@@ -2,8 +2,8 @@ name: Generate Database
 
 on:
   schedule:
-    # Run every day at noon and midnight
-    - cron:  '0 0,12 * * *'
+    # Run every Sunday at midnight
+    - cron:  '0 0 * * 0'
   push:
     branches:
       - main
@@ -27,11 +27,16 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
-    - name: Generate the database
+    - name: Generate the database (quick)
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        echo "version=$(date '+%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
+        poetry run sgs-db "db.json"
+    - name: Generate the database (verify)
+      if: ${{ github.event_name == 'schedule' }}
       run: |
         echo "version=$(date '+%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
         poetry run sgs-db -V "db.json"
-    
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:

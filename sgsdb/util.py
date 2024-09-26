@@ -36,7 +36,7 @@ def fix_languages(langauges: Union[set[str], list[str]]) -> set[str]:
     """
     Resolves all aliased languages to their base name
     """
-    return {LANGUAGE_ALIASES.get(lang, lang) for lang in langauges}
+    return {LANGUAGE_ALIASES.get(lang, lang).lower() for lang in langauges}
 
 
 def hours_minutes_seconds(td: timedelta) -> Tuple[int, int, int]:

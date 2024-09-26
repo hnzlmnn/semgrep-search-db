@@ -74,7 +74,7 @@ def build_db(args: argparse.Namespace, config: Configuration) -> int:
                 if args.ignore_duplicates:
                     continue
             ids.add(rule.id)
-            rules.insert(rule.__dict__)
+            rules.insert(rule.asdict())
 
         elapsed_time = datetime.now(timezone.utc) - start_time
         logger.info('Finished database generation in %s resulting in %d rules from %d origins.',

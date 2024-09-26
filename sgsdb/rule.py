@@ -13,7 +13,7 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import dataclasses
 from dataclasses import dataclass
 from io import StringIO
 from typing import Optional
@@ -31,6 +31,7 @@ class Rule:
     severity: str
     languages: list[str]
     category: Optional[str]
+    _data: dict
     content: str
 
     @staticmethod
@@ -51,13 +52,23 @@ class Rule:
         data['metadata']['semgrep-search']['file'] = source.filepath(path)
 
         buf = StringIO()
-        YAML(typ='rt').dump(CommentedMap({'rules': CommentedSeq([data])}), buf)
+        YAML(typ='rt').dump(data, buf)
 
         return Rule(
             source.id,
             data['id'],
-            data['severity'],
+            data.get('severity', None),
             list(fix_languages(data['languages'])),
             data.get('metadata', {}).get('category', None),
+            data,
             buf.getvalue(),
         )
+
+    def asdict(self) -> dict:
+        return {key: value for key, value in dataclasses.asdict(self).items() if not key.startswith('_')}
+
+    @property
+    def full_content(self) -> str:
+        buf = StringIO()
+        YAML(typ='rt').dump(CommentedMap({'rules': CommentedSeq([self._data])}), buf)
+        return buf.getvalue()

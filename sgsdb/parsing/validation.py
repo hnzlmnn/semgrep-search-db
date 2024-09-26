@@ -99,15 +99,15 @@ def is_valid(rule: dict) -> bool:
 
 def validate_rule_file(path: str, rule: Rule) -> bool:
     with tempfile.NamedTemporaryFile(delete=True, delete_on_close=False) as fp:
-        fp.write(rule.content.encode('utf8'))
+        fp.write(rule.full_content.encode('utf8'))
         fp.close()
 
-        result = subprocess.run([  # noqa: S607, S603
+        proc = subprocess.run([  # noqa: S607, S603
             'semgrep', '--disable-version-check', '--metrics=off', '--validate', '--config', fp.name], shell=False,
             capture_output=True)
 
-        if result.returncode != 0:
+        if proc.returncode != 0:
             logger.debug(path)
-            logger.debug(result.stderr)
+            logger.debug(proc.stderr)
             return False
     return True
