@@ -1,4 +1,4 @@
-name: Generate Database
+name: Build
 
 on:
   schedule:
@@ -11,6 +11,7 @@ on:
 
 jobs:
   build:
+    name: Generate Database
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -71,6 +72,7 @@ jobs:
         path: db.json
         retention-days: 1
   ui:
+    name: Build UI
     needs: build
     runs-on: ubuntu-latest
     defaults:
@@ -100,7 +102,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: database
-        path: db.json
+        path: src/assets/db.json
     - name: Build the app
       run: |
         npm run build  
