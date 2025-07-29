@@ -11,6 +11,9 @@ on:
 jobs:
   ui:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ui
     strategy:
       matrix:
         node-version: [ 18 ]
@@ -22,11 +25,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
       # Using npm ci is generally faster than running npm i because it caches dependencies
-      working-directory: ui
       run: |
         npm ci
     - name: Build the app
-      working-directory: ui
       run: |
         npm run build  
     - name: Setup Pages
