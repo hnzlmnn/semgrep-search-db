@@ -35,7 +35,7 @@
 
 
 <PageTitle text="Dashboard">
-    <Button>Action</Button>
+<!--    <Button>Action</Button>-->
 </PageTitle>
 <div class="wrapper content--max-width">
     <div class="grid">

@@ -1,8 +1,8 @@
 <script lang="ts">
     import type {LoadedCollection} from "../../models/collection";
     import {CachedDatabase} from "../../storage/cache";
-    import {Edit, FlashFilled, PinFilled, TrashCan} from "carbon-icons-svelte";
-    import {Button, TooltipIcon, truncate} from "carbon-components-svelte";
+    import {Edit, FlashFilled, PinFilled, TrashCan, Download} from "carbon-icons-svelte";
+    import {Button, TooltipIcon, Modal, truncate} from "carbon-components-svelte";
     import {capitalize} from "../../util/text";
     import {createEventDispatcher} from "svelte";
 
@@ -11,12 +11,27 @@
     export let collection: LoadedCollection<any>
     export let skeleton = false
 
+    let downloadAlert = false
+
     function edit() {
         dispatch('edit', collection)
     }
 
+    function download() {
+        downloadAlert = true
+    }
+
     $: icon = collection.type === 'dynamic' ? FlashFilled : PinFilled
 </script>
+
+<Modal
+        bind:open={downloadAlert}
+        modalHeading="Not yet implemented"
+        on:click:button--secondary={() => (downloadAlert = false)}
+        primaryButtonText="Ok"
+>
+    <p>This feature is currently under development.</p>
+</Modal>
 
 <div class="bx--tile collection">
     <div class="header">
@@ -27,6 +42,9 @@
             <h2 class:bx--skeleton__text={skeleton} use:truncate>{collection.name}</h2>
         </div>
         <div class="actions">
+            <Button icon={Download} iconDescription="Download Rules" kind="primary"
+                    on:click={() => download()} size="small"
+                    tooltipAlignment="end"/>
             <Button icon={Edit} iconDescription="Edit Collection" kind="tertiary"
                     on:click={() => edit()} size="small"
                     tooltipAlignment="end"/>
