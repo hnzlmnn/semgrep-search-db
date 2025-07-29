@@ -22,11 +22,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
       # Using npm ci is generally faster than running npm i because it caches dependencies
+      working-directory: ui
       run: |
-        cd ui && npm ci
+        npm ci
     - name: Build the app
+      working-directory: ui
       run: |
-        cd ui && npm run build  
+        npm run build  
     - name: Setup Pages
       uses: actions/configure-pages@v5
     - name: Upload artifact
