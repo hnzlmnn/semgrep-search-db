@@ -27,7 +27,7 @@
 <Modal
         bind:open={downloadAlert}
         modalHeading="Not yet implemented"
-        on:click:button--secondary={() => (downloadAlert = false)}
+        on:click:button--primary={() => (downloadAlert = false)}
         primaryButtonText="Ok"
 >
     <p>This feature is currently under development.</p>

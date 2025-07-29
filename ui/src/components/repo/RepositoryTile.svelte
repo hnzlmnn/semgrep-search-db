@@ -2,7 +2,7 @@
 
     import {Button, Tile} from "carbon-components-svelte";
     import type {GitRepository, Repository} from "../../models/repository";
-    import {Launch, Rule, Translate} from "carbon-icons-svelte";
+    import {Launch, Rule, Scales, Translate} from "carbon-icons-svelte";
     import type {RepositoryStats} from "../../util/statistics";
 
     export let repo: Repository | GitRepository | undefined = undefined
@@ -48,7 +48,7 @@
             <!-- TODO: Add commit ID/last updated -->
             <div class="spacer"/>
             <span class="license" class:bx--skeleton__text={skeleton} class:muted={repo?.license === null}>
-                {repo?.license ?? "Unknown"}
+                <Scales /><span>{repo?.license ?? "Unknown"}</span>
             </span>
         </div>
     </Tile>
@@ -112,6 +112,16 @@
       .source {
         &.muted {
           color: var(--cds-text-03);
+        }
+      }
+
+      .license {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        & > * {
+          margin-left: var(--cds-spacing-02);
         }
       }
     }
