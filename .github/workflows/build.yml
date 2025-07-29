@@ -102,7 +102,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: database
-        path: ui/src/assets/db.json
+        path: ui/database
+    - name: Move database
+      # Using npm ci is generally faster than running npm i because it caches dependencies
+      run: |
+        rm -f src/assets/db.json
+        cp database/db.json src/assets/db.json
     - name: Build the app
       run: |
         npm run build  
