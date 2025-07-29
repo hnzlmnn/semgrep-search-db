@@ -31,6 +31,7 @@ class Rule:
     severity: str
     languages: list[str]
     category: Optional[str]
+    description: Optional[str]
     _data: dict
     content: str
 
@@ -60,6 +61,7 @@ class Rule:
             data.get('severity', None),
             list(fix_languages(data['languages'])),
             data.get('metadata', {}).get('category', None),
+            data.get('metadata', {}).get('description', data.get('message', None)),
             data,
             buf.getvalue(),
         )

@@ -95,3 +95,33 @@ repositories:
     repo: vmnguyen/semgrep-rules
     branch: master
     license:
+  doyensec:
+    name: doyensec Unsafe Unpacking Research
+    type: github
+    repo: doyensec/Unsafe-Unpacking
+    branch: main
+    license:
+  fullstorydev:
+    name: Fullstory Go Rules
+    type: github
+    repo: fullstorydev/semgrep-rules
+    branch: main
+    license:
+  frappe:
+    name: Frappe Semgrep Rules
+    type: github
+    repo: frappe/semgrep-rules
+    branch: develop
+    license: MIT
+  julia:
+    name: Julia Rules for Semgrep
+    type: github
+    repo: JuliaComputing/semgrep-rules-julia
+    branch: main
+    license: LGPL 2.1
+  tuannq2299:
+    name: Semgrep Rule for .NET and Java
+    type: github
+    repo: tuannq2299/semgrep-rules
+    branch: master
+    license:

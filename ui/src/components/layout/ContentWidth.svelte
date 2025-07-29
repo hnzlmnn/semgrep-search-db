@@ -1,0 +1,1 @@
+<div class:content--max-width={true} {...$$restProps}><slot/></div>
